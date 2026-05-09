@@ -44,7 +44,7 @@ def load_data():
     aapl = aapl[~aapl.index.duplicated(keep='first')]
     return aapl
 
-
+@timer
 def calculate_metrics(df, start_date='2020-01-01'):
     # we'll fill this in next
     # Finding the moving averages to see trends
@@ -65,10 +65,48 @@ def calculate_metrics(df, start_date='2020-01-01'):
 
     return df
 
+@timer
 def get_insights(df):
-    # we'll fill this in next
-    pass
+    latest = df.iloc[-1]  # grabs the most recent row
 
+    close    = latest['Close']
+    ma90     = latest['MA90']
+    ma180    = latest['MA180']
+    ma270    = latest['MA270']
+    ma360    = latest['MA360']
+    vol      = latest['Volatility']
+    ret      = latest['Daily_Return']
+
+    print('===== AAPL INSIGHTS =====')
+    print(f"Latest Close:  ${close:.2f}")
+    print(f"MA90:          ${ma90:.2f}")
+    print(f"MA180:         ${ma180:.2f}")
+    print(f"MA270:         ${ma270:.2f}")
+    print(f"MA360:         ${ma360:.2f}")
+
+    # Trend signal
+    if close > ma90 > ma180 > ma270 > ma360:
+        print("Trend:         BULLISH — price is above all moving averages")
+    elif close < ma90 < ma180 < ma270 < ma360:
+        print("Trend:         BEARISH — price is below all moving averages")
+    else:
+        print("Trend:         MIXED — price is between moving averages")
+
+    # Volatility signal
+    if vol > 3:
+        print(f"Volatility:    HIGH ({vol:.2f}) — market is uncertain")
+    else:
+        print(f"Volatility:    NORMAL ({vol:.2f})")
+
+    # Last day signal
+    if ret > 0:
+        print(f"Last Return:   +{ret:.2f}% (up day)")
+    else:
+        print(f"Last Return:   {ret:.2f}% (down day)")
+
+    print('=========================')
+
+@timer
 def plot_charts(df):
     # we'll fill this in next
     #create 3 charts stacked vertically, sharing the same x-axis (date)
@@ -102,6 +140,15 @@ def plot_charts(df):
 
 if __name__ == '__main__':
     df = load_data()
+    print('--'*50)
+    print('\n')
     df = calculate_metrics(df,start_date='2020-01-01')
+    print('--'*50)
+    print('\n')
     print(df[['Close','MA90','MA180','MA270','MA360','Daily_Return','Volatility']].tail(10))
+    print('--'*50)
+    print('\n')
     plot_charts(df)
+    print('--'*50)
+    print('\n')
+    get_insights(df)

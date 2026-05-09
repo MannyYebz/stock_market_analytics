@@ -71,9 +71,37 @@ def get_insights(df):
 
 def plot_charts(df):
     # we'll fill this in next
-    pass
+    #create 3 charts stacked vertically, sharing the same x-axis (date)
+    fig, (ax1,ax2,ax3) = plt.subplots(3,1,figsize=(14,10),sharex=True)
+
+    #chart 1 - closing price with all moving averages
+    ax1.plot(df.index, df['Close'], label='Close', color = 'black', linewidth=1)
+    ax1.plot(df.index, df['MA90'], label='MA90', color = 'black', linestyle='--')
+    ax1.plot(df.index, df['MA180'], label='MA180', color = 'black', linestyle='--')
+    ax1.plot(df.index, df['MA270'], label='MA270', color = 'black', linestyle='--')
+    ax1.plot(df.index, df['MA360'], label='MA360', color = 'black', linestyle='--')
+    ax1.set_title('AAPL Price & Moving Averages')
+    ax1.set_ylabel('Price ($)')
+    ax1.legend()
+
+    # Chart 2 — Daily return percentage
+    ax2.plot(df.index, df['Daily_Return'], color='blue', linewidth=0.8)
+    ax2.axhline(0, color='red', linestyle='--', linewidth=0.8)  # zero line for reference
+    ax2.set_title('Daily Return %')
+    ax2.set_ylabel('Return (%)')
+
+    # Chart 3 — Rolling volatility
+    ax3.plot(df.index, df['Volatility'], color='orange', linewidth=0.8)
+    ax3.set_title('30-Day Rolling Volatility')
+    ax3.set_ylabel('Volatility (%)')
+
+    plt.tight_layout()  # prevents charts from overlapping
+    plt.savefig('charts/aapl_analysis.png')
+    plt.show()
+    
 
 if __name__ == '__main__':
     df = load_data()
     df = calculate_metrics(df,start_date='2020-01-01')
     print(df[['Close','MA90','MA180','MA270','MA360','Daily_Return','Volatility']].tail(10))
+    plot_charts(df)
